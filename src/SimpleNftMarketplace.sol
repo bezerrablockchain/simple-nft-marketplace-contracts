@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./common-interfaces/IERC721.sol";
-import "./common-interfaces/IERC20.sol";
+// import "./common-interfaces/IERC721.sol";
+// import "./common-interfaces/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 // import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
