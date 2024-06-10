@@ -3,8 +3,8 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
 import "../src/SimpleNftMarketplace.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Upgradeable.sol";
 
 contract SimpleNftMarketplaceTest is Test {
     SimpleNftMarketplace marketplace;
@@ -98,7 +98,7 @@ contract SimpleNftMarketplaceTest is Test {
 }
 
 // Mock ERC20 Token for testing
-contract MockERC20 is ERC20 {
+contract MockERC20 is ERC20Upgradeable {
     constructor() ERC20("Mock ERC20", "MERC20") {}
 
     function mint(address to, uint256 amount) external {
@@ -107,7 +107,7 @@ contract MockERC20 is ERC20 {
 }
 
 // Mock ERC721 Token for testing
-contract MockERC721 is ERC721 {
+contract MockERC721 is ERC721Upgradeable {
     constructor() ERC721("Mock ERC721", "MERC721") {}
 
     function mint(address to, uint256 tokenId) external {

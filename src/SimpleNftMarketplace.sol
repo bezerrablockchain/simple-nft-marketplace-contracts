@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./common-interfaces/IERC721.sol";
+import "./common-interfaces/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+// import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract SimpleNftMarketplace is Initializable, AccessControl, UUPSUpgradeable {
+contract SimpleNftMarketplace is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-    bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
     
     struct Offer {
         address seller;
@@ -21,6 +20,7 @@ contract SimpleNftMarketplace is Initializable, AccessControl, UUPSUpgradeable {
     }
 
     uint256 public offerCount;
+    address owner;
     mapping(uint256 => Offer) public offers;
     mapping(address => bool) public allowedTokens;
 
@@ -29,9 +29,10 @@ contract SimpleNftMarketplace is Initializable, AccessControl, UUPSUpgradeable {
     event OfferAccepted(uint256 offerId, address indexed buyer);
 
     function initialize(address admin) initializer public {
-        _setupRole(DEFAULT_ADMIN_ROLE, admin);
-        _setupRole(UPGRADER_ROLE, admin);
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _grantRole(UPGRADER_ROLE, admin);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        owner = admin;
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
@@ -80,10 +81,10 @@ contract SimpleNftMarketplace is Initializable, AccessControl, UUPSUpgradeable {
         if (offer.paymentToken == address(0)) {
             require(msg.value == offer.price, "Incorrect ETH amount");
             payable(offer.seller).transfer(sellerAmount);
-            payable(getRoleMember(DEFAULT_ADMIN_ROLE, 0)).transfer(fee);
+            payable(owner).transfer(fee);
         } else {
             IERC20(offer.paymentToken).transferFrom(msg.sender, offer.seller, sellerAmount);
-            IERC20(offer.paymentToken).transferFrom(msg.sender, getRoleMember(DEFAULT_ADMIN_ROLE, 0), fee);
+            IERC20(offer.paymentToken).transferFrom(msg.sender, owner, fee);
         }
 
         IERC721(offer.nftContract).transferFrom(address(this), msg.sender, offer.tokenId);
